@@ -1,0 +1,38 @@
+{
+  "name": "test-blog",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "gatsby develop -p 9988 -o"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@mdx-js/mdx": "^1.6.22",
+    "@mdx-js/react": "^1.6.22",
+    "babel-plugin-styled-components": "^1.12.1",
+    "gatsby": "^3.8.1",
+    "gatsby-plugin-mdx": "^2.8.0",
+    "gatsby-plugin-sharp": "^3.8.0",
+    "gatsby-plugin-styled-components": "^4.8.0",
+    "gatsby-plugin-typography": "^3.8.0",
+    "gatsby-remark-images": "^5.5.0",
+    "gatsby-source-filesystem": "^3.8.0",
+    "prism-react-renderer": "^1.2.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-live": "^2.2.3",
+    "react-typography": "^0.16.20",
+    "rehype-katex": "^5.0.0",
+    "remark-math": "^3.0.1",
+    "remark-slug": "^6.0.0",
+    "styled-components": "^5.3.0",
+    "typography": "^0.16.21"
+  },
+  "devDependencies": {
+    "gh-pages": "^3.2.3"
+  }
+}

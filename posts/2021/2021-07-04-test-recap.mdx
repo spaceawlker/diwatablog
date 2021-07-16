@@ -1,0 +1,234 @@
+---
+title: "Math and Counting: Regular Recap 00"
+date: 2021-07-04
+published: true
+preview: Functions, counting, and sums galore
+---
+
+import "katex/dist/katex.min.css";
+
+_This is the start of a series I want to do regularly
+where I walk through some of the problems that come out
+in regular contests from some popular online judges. As
+of now, I only aim to cover [Codeforces](https://codeforces.com/)
+and [Atcoder](https://atcoder.jp/) simply because that is where
+I spend most of my time. But if significant contests happen
+elsewhere, I'll check them out too._
+
+In this recap, we'll take a look at a few ways to wrangle numbers,
+and use the relationships they have between each other to their advantage.
+
+## On non-divisors: Strange Function
+
+Link [here](https://codeforces.com/contest/1542/problem/C).
+
+_Abridged statement:_ Let $f(i)$ be the smaller number that is _not_ a divisor 
+of $i$. Find the sum $f(1) + f(2) + \dots + f(n)$. Constraints: at most $10^4$
+test cases, and in each, $1 \leq n \leq 10^{16}$.
+
+### Poking around
+
+When you have no idea what to do, it's a good idea to experiment. Computing
+a few values of $f$:
+
+
+| $i$  | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 |
+|-----:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:--:|:--:|
+|$f(i)$| 2 | 3 | 2 | 3 | 2 | 4 | 2 | 3 | 2 | 3  | 2  |
+
+Right away, we can see that all odd numbers have $f(x) = 2$. It is easy to see why:
+all numbers are divisible by 1, but these odd numbers are now not divisible by 2. So 
+by definition, $f$ is 2. Counting how many odd numbers are below $n$ is simple:
+it's just $\lceil n / 2 \rceil - 1$. So we have this amount of 2s in our summation.
+
+We can also see from the table that a lot of numbers have $f(x) = 3$.
+Repeating the definition, this means $n$ is divisible by 2, but not by 3.
+Notice that that 'not by 3' condition excludes only those numbers that are divisible
+by 6. So there are $\lfloor n/2 \rfloor$ numbers $n$ that are divisible by 2,
+and among these, there are $\lfloor n/6 \rfloor$ numbers that are divisible by 3.
+So the overall number of $n$ such that $f(x) = 3$ is
+
+$$
+\lfloor n/2 \rfloor - \lfloor n/6 \rfloor
+$$
+
+We can also see one 4 in the table. Maybe it's a good idea to try and tease out
+the pre-image of 4? We want numbers $n$ that are divisible by 2 and 3, but not 4.
+To address the 'by 2 and 3', we invoke the concept of the [least common
+multiple](https://www.khanacademy.org/math/cc-sixth-grade-math/cc-6th-factors-and-multiples/cc-6th-lcm/v/least-common-multiple-exercise):
+
+> For integers $a_1, a_2, \dots, a_k$, their _least common multiple_
+> is the smallest $x$ such that $a_1, a_2, \dots, a_k$ are all divisors of $x$.
+> This is written $\lcm(a_1, a_2, \dots, a_k)$.
+>
+> It can be shown that any integer is divisible by all of $a_1, \dots, a_k$
+> if and only if it is divisible by their LCM.
+
+So any number that is divisible by 2 and 3 must also be divisible by $\lcm(2, 3) = 6$.
+We now need to address the '... but not 4'. This excludes just the numbers
+that are divisible by $\lcm(6, 4) = 24$. So the number of $x \leq n$ such that $f(x) = 24$
+is
+
+$$
+\lfloor n/6 \rfloor - \lfloor n/24 \rfloor
+$$
+
+### Making a generalization
+
+Now, if finding the number of $n$ such that $f(n)$ is some fixed value is simple
+if that fixed value is 2 or 3 or 4, there's a good chance it'll be simple if that 
+fixed value is anything. Let's cash in on our insight by asking
+
+> For a fixed $k$, how many numbers $x \leq n$ are there such that $f(x) = k$?
+
+As before, we find that $k$ is divisible by all integers from $1$ to $k - 1$, but not $k$.
+Just as in the $k = 4$ case, we simplify this by looking for the LCM of these integers.
+Let $A = \lcm(1, 2, \dots, k - 1)$ and $B = \lcm(A, k)$
+Then the number we are looking for is simply
+
+$$
+\lfloor n/A \rfloor - \lfloor n/B \rfloor
+$$
+
+### Doing the finishing move 
+
+Now that we can easily group the $f(\cdot)$ terms into groups where they all have 
+value 2, 3, 4, etc., it is natural to compute the sum this way:
+
+$$
+\sum_{i=2}^{\infty} i \cdot \text{(size of pre-image of } i \text{)}
+$$
+
+This is called _swapping the summations_, which is a common idea elsewhere in math
+(see 2.2 of [this](https://web.evanchen.cc/handouts/Summation/Summation.pdf) for more examples).
+On first glance, this does nothing, since now we have an $O(\infty)$ solution per test case,
+which is absolutely worthless. But, do we really have to iterate until $i$ is very high
+to get the answer? Trying a few examples by hand, you'll notice that $A$ gets really big
+really quickly; at $i = 69$, $A$ has almost 30 digits already, which is far above the $10^{16}$
+this problem asks us to deal with. The [reference solution](https://codeforces.com/blog/entry/92492) stops summing when $A$ exceeds $n$,
+but you're free to hardcode it to stop at some value where $A$ is above $10^{16}$. That 
+gives us quite a fast solution per test case. I can ballpark a complexity of $O(\log ^2 n)$,
+but I'm sure a better bound exists
+
+### More details
+
+There are a few details I glanced over, such as:
+
+- How to actually compute the LCM. There are formulas for this online, and rediscovering them
+might be a nice exercise.
+- Dealing with the 'modulo $10^9 + 7$' condition. These kinds of conditions are really just
+there so you can solve the problem without running into overflow of even `long long`,
+so just use `% 1000000007` on all your intermediate computations and you should be fine.
+I might cover the intricacies of modulo in another post.
+
+But this should be more that enough to get you on the process.
+
+## Through a looking glass: AquaMoon and Chess
+
+We now look at a problem whose main computations are easy to do... if you 
+know what to look for. Link [here](https://codeforces.com/contest/1545/problem/B).
+
+_Abridged statement_: You are given a binary string of length $\leq 10^5$. In 
+one move, you can turn `110` into `011`, and vice versa. How many different strings,
+modulo 998244353, can you turn the current string into, using some sequence of moves?
+
+### Getting a start
+
+One way to start is to observe that the `1` that moves in an operation maintains
+the parity of its position. Therefore, an upper bound for the answer is the ways
+to arrange all the characters in even positions, then all the characters in odd
+positions. 
+
+But is it the answer? Sadly, checking the second sample suggests not. The string
+`011011` is split into `011` at even positions, and `101` at odd positions (using
+zero-indexing). So this suggests an answer of 9, but the answer to the sample is 6.
+
+Why is this so? Our theory says a position like `111001` is possible, but playing 
+around with `011011` suggests the right way to think about it is to pair the ones up.
+Playing with sliding the ones around does indeed produce 6.
+
+### Breaking in
+
+Okay, so pairs.
+
+Given how the move involves pairs of ones, there's a good candidate for
+an easy case to go for, the case where all ones are 'paired up' like this:
+
+> `000110111100111111000000`
+
+In this case, we can look at the first `11`; it 'floats' freely among the 0s. We
+can say the same for the next `11` pair, and the next, and the next. It doesn't really
+make any sense to split it up any other way; for instance, if we had instead
+split the block of four ones as `(1)(11)(1)`, we wouldn't be able to make any moves.
+
+So now we have some pairs of ones 'floating' in a sea of zeroes. If there are $p$
+pairs of ones and $z$ zeroes, then there are $\binom{p + z}{z}$ ways overall!
+
+### Breaking back out
+
+Now, how do we handle strings with odd blocks of ones? Again, we simplify by 
+looking at a lone one. That lone one only interacts with other ones by acting
+as a 'membrane' that other moving ones can freely pass through:
+
+```text
+...
+0110[1]00
+0011[1]00
+001[1]100 (This move is not actually performed, but it makes no difference to the answer anyway)
+00[1]1100
+00[1]0110
+...
+```
+
+If we try to extend this theory of lone ones to blocks of odd size that are 
+longer than one block long, we see that we can still think about them this way:
+
+```text
+01111[1]00
+0111[1]100 (another fake move)
+011[1]1100
+011[1]0110
+...
+```
+
+So if we let $p$ be the number of paired ones, $l$ be the number of lone ones, and
+$z$ be the number of zeroes, then is $\binom{p + l + z}{p, l, z}$ the answer?
+
+Not quite - observing the sample movement of paired ones above, and decomposing
+them according to our definitions gives us
+
+```text
+zpplzz
+zplpzz
+zplzpz
+...
+```
+
+The first and the second configurations correspond to the same binary string!
+To prevent overcount, we can try imposing some sort of condition on substrings
+of the form `...pplppp...` to make sure they can only appear in one form. Namely:
+that they should only appear in the form `...pppl(maybe some zs here)`. One 
+good way to summarize this is that the substring `lp` should not exist.
+
+Which is... difficult to control; the easiest to think of approaches 
+usually involve some sort of 3D dynamic programming. This suggests we try looking
+around somewhere else. If `lp` shouldn't exist, then an `l` should basically remain
+forever bonded to the `z` beside it (or the end of the string, if this `l` terminates
+the string.)
+
+So, let $a$ be the number of `p`s, and let $b$ be the number of `z`s, `lz`s, or `l`s 
+at the end of the string. Then the answer is just
+$\binom{a + b}{b}$!
+
+Except that's slightly wrong: there's no way to move an `l` at the end of a string. So just
+remove that from the count of $b$, and we should be fine. (I spent two Wrong Answers
+in contest on this mistake).
+
+Actually computing this binomial coefficient is left as an exercise. But
+it should be doable now.
+
+## Conclusion
+
+That's it for the recap. I covered mostly math-heavy problems, but I'd like to talk 
+about other kinds of problems in the future. If there's anything you find interesting,
+do let me know about it!

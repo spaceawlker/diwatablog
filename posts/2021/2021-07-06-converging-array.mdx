@@ -1,0 +1,69 @@
+---
+title: "Deep Dive 00: Thinking graphically"
+date: 2021-07-06
+published: false
+preview: WIP
+---
+
+- Introduction to series
+- Introduction to [problem](https://codeforces.com/contest/1540/problem/C1)
+
+- First attacks:
+    - Misread operation as subtracting b_i to both; be very
+        confused as to how to go further
+    - Realize that each operation is basically forcing the
+        difference between elements to be >= b_i
+    - Sum is invariant. I think that kills, but
+        some gaps might be larger than their b_i at the end
+        so the problem isn't dead yet
+- Simpler case attack: all b_i equal to zero
+    - Operation is "set two elements to their average"
+    - So a decreasing sequence will just become constant
+    - But general sequences are thonk
+    - You can probably just keep agar.io-ing elements
+        by averaging out, and if you let it run infinitely,
+        it will converge to the average of the big sequence
+- Try to generalize: all b_i equal
+    - We're confident enough to say the same here,
+        replacing "decreasing" with "sequence whose diff array
+        is all < b"
+    - But how do we prove?
+        - Notice that we never cause a difference to exceed b.
+        We might cause a difference to be b, or for a >b-difference
+        to be less than b, but we never "breach" the b barrier
+        - So if an element is agar.io-ed into an average, it can't leave
+    - At this point, try to "force" this case to look like the all-zero
+        case, because that's more obvious to look at. One way to do this
+        is to deduct b to the first element, deduct 2b to the second element,
+        since that basically deducts b from all elements of the diff array.
+        And this does maintain the operation!
+- Full proof
+    - That "forcing" idea still works, just replace b, 2b, etc.
+        with partial sums
+- Now what?
+    - Can find the limit of one sequence, but the problem asks
+        to mass-find limits of sequences
+    - Reminds me of USACO Balance Beam; but the operation is different
+        so I can't kill with that
+        - The operation here is a_i = (a_(i-1) + a_(i+1))/2, and 
+        you solve this by graphing the a_i and realizing
+        that you are looking for a convex hull
+- The connected components idea
+    - Inspired from Sorting the Planets; notice that the operation keeps
+        these invariant
+    - The problem is that an operation can create more connected components
+- The split points idea
+    - If a point has its averages before < its average after, this stays the same forever
+    - Try to prove that the set of points that do this remain the same forever
+    - The problem is that points that do not satisfy this satisfy this later on
+    - (In fact, at the end, all points satisfy this)
+    - But from here further, the idea that sum-related things 
+        are only affected at the precise point where you operate
+        becomes very important
+- Wait, another sum-related thing is the partial sum...
+    - At which point it literally just becomes balance beam BRUH :NikoSeizure:
+- We can "cash in" at this point, by converting to a counting DP problem,
+    where we pick points accdg to conditions, one of them being that
+    the points we pick must stay above or on a certain line
+
+- Hard version (TODO)
